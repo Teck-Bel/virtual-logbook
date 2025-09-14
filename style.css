@@ -117,3 +117,46 @@ hr {
   text-align: center;
   gap: 20px;              /* ruimte tussen elementen */
 }
+
+/* ===== Dashboard styling ===== */
+.dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      padding: 40px;
+      max-width: 900px;
+      margin: auto;
+}
+
+.dashboard-tile {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     text-align: center;
+     background-color: #003366;
+     padding: 20px;
+     border-radius: 12px;
+     text-decoration: none;
+     transition: transform 0.2s ease, background-color 0.2s ease;
+   }
+
+   .dashboard-tile img {
+     width: 80px;
+     height: 80px;
+     object-fit: contain;
+     margin-bottom: 10px;
+   }
+
+.dashboard-tile span {
+     font-weight: bold;
+     color: white;
+   }
+
+.dashboard-tile:hover {
+     background-color: #fcfcfc;
+     transform: scale(1.03);
+   }
+
+  .dashboard-tile:hover span {
+    color: #001f3f;
+  }
