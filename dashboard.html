@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard | Virual Logbook</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <button id="logoutBtn">Uitloggen</button>
+
+    <script>
+      // Firebase init (zelfde config als bij login/registratie)
+      const firebaseConfig = {
+        apiKey: "AIzaSyC8nu1Bc7XRZrtsTNhi66AMwhCxEm0uwKE",
+        authDomain: "virtual-logbook-f585b.firebaseapp.com",
+        projectId: "virtual-logbook-f585b",
+       storageBucket: "virtual-logbook-f585b.firebasestorage.app",
+        messagingSenderId: "780459794556",
+        appId: "1:780459794556:web:1fabb3ed9eb31e44eb69f9"
+      };
+      const app = firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+
+      // Uitlogknop
+      const logoutBtn = document.getElementById('logoutBtn');
+      logoutBtn.addEventListener('click', () => {
+      auth.signOut()
+        .then(() => {
+          // Gebruiker is uitgelogd, redirect naar loginpagina
+          window.location.href = "login.html";
+        })
+        .catch(err => {
+          console.error("Uitloggen mislukt:", err);
+        });
+    });
+  </script>
+  </body>
+</html>
