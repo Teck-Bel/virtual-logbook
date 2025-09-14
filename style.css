@@ -97,3 +97,14 @@ hr {
 #logoutBtn:hover {
   background-color: #d9363e;
 }
+
+.cta-button {
+  background-color: #778DA9;
+  font-size: 1.25rem;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  color: white;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
