@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login | Virtual logbook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css"/>
+
+    <!-- Firebase SDK compat (v9 compat versie) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  </head>
+  <body>
+    <h1>Login bij Virtual logbook</h1>
+    <div class="login-container">
+      <form id="loginForm">
+        <label for="email">E-mailadres</label>
+        <input type="email" id="email" required />
+
+        <label for="password">Wachtwoord</label>
+        <input type="password" id="password" required />
+
+        <button type="submit">Inloggen</button>
+        <div id="error" class="error-message" role="alert" aria-live="assertive"></div>
+      </form>
+    </div>
+
+     <script>
+      // ===== Firebase Config =====
+      const firebaseConfig = {
+        apiKey: "AIzaSyC8nu1Bc7XRZrtsTNhi66AMwhCxEm0uwKE",
+        authDomain: "virtual-logbook-f585b.firebaseapp.com",
+        projectId: "virtual-logbook-f585b",
+        storageBucket: "virtual-logbook-f585b.firebasestorage.app",
+        messagingSenderId: "780459794556",
+        appId: "1:780459794556:web:1fabb3ed9eb31e44eb69f9",
+        measurementId: "G-82K50X46FF"
+      };
+
+      // ===== Firebase Initialisatie =====
+      const app = firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+      // ===== Elementen =====
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const loginEmailBtn = document.getElementById('loginEmail');
+      const loginGoogleBtn = document.getElementById('loginGoogle');
+      const errorText = document.getElementById('error');
+
+      // ===== Email/Wachtwoord Login =====
+      loginEmailBtn.addEventListener('click', () => {
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        auth.signInWithEmailAndPassword(email, password)
+          .then(userCredential => {
+            alert("Inloggen gelukt!");
+            // Optioneel: redirect naar dashboard
+            window.location.href = "dashboard.html";
+          })
+          .catch(error => {
+            errorText.textContent = error.message;
+          });
+      });
+
+      // ===== Google Login =====
+      loginGoogleBtn.addEventListener('click', () => {
+        auth.signInWithPopup(googleProvider)
+          .then(result => {
+            alert("Inloggen met Google gelukt!");
+            window.location.href = "dashboard.html";
+          })
+          .catch(error => {
+            errorText.textContent = error.message;
+          });
+      });
+
+      // ===== Auto redirect als al ingelogd =====
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          window.location.href = "dashboard.html";
+        }
+      });
+    </script>
+  </body>
+</html>
