@@ -108,3 +108,12 @@ hr {
   display: inline-block;
   transition: background-color 0.3s ease;
 }
+
+/* Specifiek voor index.html */
+.index-container {
+  display: flex;
+  flex-direction: column; /* items onder elkaar */
+  align-items: center;    /* horizontaal centreren */
+  text-align: center;
+  gap: 20px;              /* ruimte tussen elementen */
+}
