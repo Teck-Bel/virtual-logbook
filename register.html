@@ -15,11 +15,14 @@
     <!-- Firebase SDK compat -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   </head>
   <body>
     <div class="container">
       <h2>Registreren</h2>
       <form id="registerForm">
+        <input type="text" id="registerName" placeholder="Volledige naam" required>
+        <input type="text" id="registerClub" placeholder="Club (optioneel)">
         <input type="email" id="registerEmail" placeholder="E-mailadres" required>
         <input type="password" id="registerPassword" placeholder="Wachtwoord" required>
         <button type="submit">Registreren</button>
@@ -30,6 +33,7 @@
     </div>
 
     <script>
+      // 🔹 Firebase config
       const firebaseConfig = {
         apiKey: "AIzaSyC8nu1Bc7XRZrtsTNhi66AMwhCxEm0uwKE",
         authDomain: "virtual-logbook-f585b.firebaseapp.com",
@@ -38,23 +42,42 @@
         messagingSenderId: "780459794556",
         appId: "1:780459794556:web:1fabb3ed9eb31e44eb69f9"
       };
-      const app = firebase.initializeApp(firebaseConfig);
-      const auth = firebase.auth();
 
+      // 🔹 Init Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+
+      // 🔹 Form elements
       const registerForm = document.getElementById('registerForm');
+      const registerName = document.getElementById('registerName');
+      const registerClub = document.getElementById('registerClub');
       const registerEmail = document.getElementById('registerEmail');
       const registerPassword = document.getElementById('registerPassword');
       const messageDiv = document.getElementById('message');
 
+      // 🔹 Submit
       registerForm.addEventListener('submit', e => {
         e.preventDefault();
+
         auth.createUserWithEmailAndPassword(registerEmail.value, registerPassword.value)
-          .then(userCredential => {
-            userCredential.user.sendEmailVerification()
-              .then(() => {
-                messageDiv.textContent = "Registratie gelukt! Check je e-mail voor verificatie.";
-                messageDiv.className = "success";
-              });
+          .then(async userCredential => {
+            const user = userCredential.user;
+
+            // Opslaan in Firestore (users-collectie met UID als document ID)
+            await db.collection("users").doc(user.uid).set({
+              name: registerName.value,
+              club: registerClub.value,
+              email: registerEmail.value,
+              createdAt: new Date()
+            });
+
+            // E-mail verificatie sturen
+            await user.sendEmailVerification();
+
+            messageDiv.textContent = "Registratie gelukt! Check je e-mail voor verificatie.";
+            messageDiv.className = "success";
+            registerForm.reset();
           })
           .catch(err => {
             messageDiv.textContent = err.message;
