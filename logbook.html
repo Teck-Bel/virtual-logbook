@@ -4,100 +4,12 @@
     <meta charset="UTF-8" />
     <title>Logbook | Virtual Logbook</title>
     <link rel="stylesheet" href="style.css"/>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        background: #f4f6f9;
-      }
-      h1 {
-        text-align: center;
-        color: #003366;
-      }
-      form {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        max-width: 600px;
-        margin: 0 auto 30px auto;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-      form div {
-        margin-bottom: 15px;
-      }
-      label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 5px;
-      }
-      input, textarea {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-      button {
-        background: #003366;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      button:hover {
-        background: #0055aa;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 30px;
-      }
-      th, td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: center;
-      }
-      th {
-        background: #003366;
-        color: white;
-      }
-    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
   </head>
   <body>
     <h1>Mijn Logbook</h1>
-
-    <!-- Invoerformulier -->
-    <form id="logForm">
-      <div>
-        <label for="date">Datum</label>
-        <input type="date" id="date" required />
-      </div>
-      <div>
-        <label for="aircraft">Vliegtuigtype</label>
-        <input type="text" id="aircraft" placeholder="Bijv. ASK-21" required />
-      </div>
-      <div>
-        <label for="registration">Registratie</label>
-        <input type="text" id="registration" placeholder="OO-ABC" required />
-      </div>
-      <div>
-        <label for="from">Vertrek</label>
-        <input type="text" id="from" required />
-      </div>
-      <div>
-        <label for="to">Bestemming</label>
-        <input type="text" id="to" required />
-      </div>
-      <div>
-        <label for="time">Vliegtijd (uren:minuten)</label>
-        <input type="text" id="time" placeholder="1:25" required />
-      </div>
-      <div>
-        <label for="remarks">Opmerkingen</label>
-        <textarea id="remarks" rows="3"></textarea>
-      </div>
-      <button type="submit">Toevoegen</button>
-    </form>
 
     <!-- Tabel met logboek entries -->
     <table id="logTable">
@@ -112,43 +24,42 @@
           <th>Opmerkingen</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- Nieuwe entries komen hier -->
+      <tbody id="logTableBody">
+        <!-- Vluchten komen hier automatisch -->
       </tbody>
     </table>
 
     <script>
-      const form = document.getElementById('logForm');
-      const tableBody = document.getElementById('logTable').querySelector('tbody');
+      // 🔹 Firebase-config hier invullen
+      const firebaseConfig = {
+        apiKey: "JOUW_API_KEY",
+        authDomain: "jouw-project.firebaseapp.com",
+        projectId: "jouw-project",
+      };
 
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
+      // Firebase initialiseren
+      const app = firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
 
-        // Data ophalen
-        const date = document.getElementById('date').value;
-        const aircraft = document.getElementById('aircraft').value;
-        const reg = document.getElementById('registration').value;
-        const from = document.getElementById('from').value;
-        const to = document.getElementById('to').value;
-        const time = document.getElementById('time').value;
-        const remarks = document.getElementById('remarks').value;
+      // Vluchten ophalen uit Firestore
+      const tableBody = document.getElementById("logTableBody");
 
-        // Nieuwe rij maken
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${date}</td>
-          <td>${aircraft}</td>
-          <td>${reg}</td>
-          <td>${from}</td>
-          <td>${to}</td>
-          <td>${time}</td>
-          <td>${remarks}</td>
-        `;
-
-        tableBody.appendChild(row);
-
-        // Formulier resetten
-        form.reset();
+      db.collection("flights").orderBy("date", "desc").onSnapshot(snapshot => {
+        tableBody.innerHTML = ""; // tabel leegmaken
+        snapshot.forEach(doc => {
+          const flight = doc.data();
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${flight.date || ""}</td>
+            <td>${flight.aircraft || ""}</td>
+            <td>${flight.registration || ""}</td>
+            <td>${flight.from || ""}</td>
+            <td>${flight.to || ""}</td>
+            <td>${flight.time || ""}</td>
+            <td>${flight.remarks || ""}</td>
+          `;
+          tableBody.appendChild(row);
+        });
       });
     </script>
   </body>
