@@ -4,6 +4,69 @@
     <meta charset="UTF-8" />
     <title>Logbook | Virtual Logbook</title>
     <link rel="stylesheet" href="style.css"/>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f4f6f9;
+      }
+      h1 {
+        text-align: center;
+        color: #003366;
+        margin-top: 20px;
+      }
+      /* 🔹 Dashboard-strook */
+      .stats-bar {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background: #003366;
+        color: white;
+        padding: 15px;
+        flex-wrap: wrap;
+      }
+      .stat {
+        text-align: center;
+        margin: 10px;
+      }
+      .stat h2 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+      .stat p {
+        margin: 5px 0 0 0;
+        font-size: 0.9rem;
+      }
+      .add-btn {
+        background: white;
+        color: #003366;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .add-btn:hover {
+        background: #0055aa;
+        color: white;
+      }
+      /* 🔹 Tabel */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+      th {
+        background: #003366;
+        color: white;
+      }
+    </style>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
@@ -11,7 +74,24 @@
   <body>
     <h1>Mijn Logbook</h1>
 
-    <!-- Tabel met logboek entries -->
+    <!-- 🔹 Dashboard-strook -->
+    <div class="stats-bar">
+      <div class="stat">
+        <h2 id="startsCount">0</h2>
+        <p>Starts (24 mnd)</p>
+      </div>
+      <div class="stat">
+        <h2 id="picHours">0</h2>
+        <p>Uren PIC (24 mnd)</p>
+      </div>
+      <div class="stat">
+        <h2 id="checkFlights">0</h2>
+        <p>Checkvluchten (24 mnd)</p>
+      </div>
+      <a href="insertFlight.html" class="add-btn">+ Vlucht ingeven</a>
+    </div>
+
+    <!-- 🔹 Tabel met logboek entries -->
     <table id="logTable">
       <thead>
         <tr>
@@ -32,22 +112,42 @@
     <script>
       // 🔹 Firebase-config hier invullen
       const firebaseConfig = {
-        apiKey: "JOUW_API_KEY",
-        authDomain: "jouw-project.firebaseapp.com",
-        projectId: "jouw-project",
+        apiKey: "AIzaSyC8nu1Bc7XRZrtsTNhi66AMwhCxEm0uwKE",
+        authDomain: "virtual-logbook-f585b.firebaseapp.com",
+        projectId: "virtual-logbook-f585b",
       };
 
       // Firebase initialiseren
       const app = firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
 
-      // Vluchten ophalen uit Firestore
       const tableBody = document.getElementById("logTableBody");
 
+      // Statistiek velden
+      const startsCountEl = document.getElementById("startsCount");
+      const picHoursEl = document.getElementById("picHours");
+      const checkFlightsEl = document.getElementById("checkFlights");
+
+      // Datum 24 maanden terug
+      const now = new Date();
+      const past24m = new Date();
+      past24m.setMonth(now.getMonth() - 24);
+
+      let startsCount = 0;
+      let picHours = 0;
+      let checkFlights = 0;
+
       db.collection("flights").orderBy("date", "desc").onSnapshot(snapshot => {
-        tableBody.innerHTML = ""; // tabel leegmaken
+        tableBody.innerHTML = "";
+        startsCount = 0;
+        picHours = 0;
+        checkFlights = 0;
+
         snapshot.forEach(doc => {
           const flight = doc.data();
+          const date = new Date(flight.date);
+
+          // Alle vluchten in tabel zetten
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${flight.date || ""}</td>
@@ -59,7 +159,30 @@
             <td>${flight.remarks || ""}</td>
           `;
           tableBody.appendChild(row);
+
+          // Statistieken voor laatste 24 maanden
+          if (date >= past24m) {
+            startsCount += 1;
+
+            // PIC uren (verwacht formaat "h:mm")
+            if (flight.time) {
+              const parts = flight.time.split(":");
+              if (parts.length === 2) {
+                picHours += parseInt(parts[0]) + parseInt(parts[1]) / 60;
+              }
+            }
+
+            // Checkvluchten tellen (bv. als 'check' in opmerkingen staat)
+            if (flight.remarks && flight.remarks.toLowerCase().includes("check")) {
+              checkFlights += 1;
+            }
+          }
         });
+
+        // Waarden tonen
+        startsCountEl.textContent = startsCount;
+        picHoursEl.textContent = picHours.toFixed(1);
+        checkFlightsEl.textContent = checkFlights;
       });
     </script>
   </body>
