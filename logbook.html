@@ -4,8 +4,152 @@
     <meta charset="UTF-8" />
     <title>Logbook | Virtual Logbook</title>
     <link rel="stylesheet" href="style.css"/>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f4f6f9;
+      }
+      h1 {
+        text-align: center;
+        color: #003366;
+      }
+      form {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 600px;
+        margin: 0 auto 30px auto;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      form div {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      input, textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      button {
+        background: #003366;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #0055aa;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+      th {
+        background: #003366;
+        color: white;
+      }
+    </style>
   </head>
   <body>
-    <h1>Logbook</h1>
+    <h1>Mijn Logbook</h1>
+
+    <!-- Invoerformulier -->
+    <form id="logForm">
+      <div>
+        <label for="date">Datum</label>
+        <input type="date" id="date" required />
+      </div>
+      <div>
+        <label for="aircraft">Vliegtuigtype</label>
+        <input type="text" id="aircraft" placeholder="Bijv. ASK-21" required />
+      </div>
+      <div>
+        <label for="registration">Registratie</label>
+        <input type="text" id="registration" placeholder="OO-ABC" required />
+      </div>
+      <div>
+        <label for="from">Vertrek</label>
+        <input type="text" id="from" required />
+      </div>
+      <div>
+        <label for="to">Bestemming</label>
+        <input type="text" id="to" required />
+      </div>
+      <div>
+        <label for="time">Vliegtijd (uren:minuten)</label>
+        <input type="text" id="time" placeholder="1:25" required />
+      </div>
+      <div>
+        <label for="remarks">Opmerkingen</label>
+        <textarea id="remarks" rows="3"></textarea>
+      </div>
+      <button type="submit">Toevoegen</button>
+    </form>
+
+    <!-- Tabel met logboek entries -->
+    <table id="logTable">
+      <thead>
+        <tr>
+          <th>Datum</th>
+          <th>Type</th>
+          <th>Registratie</th>
+          <th>Van</th>
+          <th>Naar</th>
+          <th>Tijd</th>
+          <th>Opmerkingen</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Nieuwe entries komen hier -->
+      </tbody>
+    </table>
+
+    <script>
+      const form = document.getElementById('logForm');
+      const tableBody = document.getElementById('logTable').querySelector('tbody');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Data ophalen
+        const date = document.getElementById('date').value;
+        const aircraft = document.getElementById('aircraft').value;
+        const reg = document.getElementById('registration').value;
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
+        const time = document.getElementById('time').value;
+        const remarks = document.getElementById('remarks').value;
+
+        // Nieuwe rij maken
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${date}</td>
+          <td>${aircraft}</td>
+          <td>${reg}</td>
+          <td>${from}</td>
+          <td>${to}</td>
+          <td>${time}</td>
+          <td>${remarks}</td>
+        `;
+
+        tableBody.appendChild(row);
+
+        // Formulier resetten
+        form.reset();
+      });
+    </script>
   </body>
 </html>
