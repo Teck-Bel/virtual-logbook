@@ -10,7 +10,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px; /* ruimte boven de tabel */
+        margin-bottom: 20px;
       }
 
       .header-bar h1 {
@@ -74,11 +74,8 @@
         color: white;
       }
     </style>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
   </head>
-  <body data-tile="Logbook">
+  <body data-title="Logbook">
     <div id="header-placeholder"></div>
 
     <!-- 🔹 Titel + Dashboard -->
@@ -118,17 +115,23 @@
       </tbody>
     </table>
 
-    <script>
-      // 🔹 Firebase-config hier invullen
+    <!-- Firebase scripts -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import { 
+        getFirestore, collection, query, orderBy, onSnapshot 
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+      // 🔹 Firebase-config
       const firebaseConfig = {
         apiKey: "AIzaSyC8nu1Bc7XRZrtsTNhi66AMwhCxEm0uwKE",
         authDomain: "virtual-logbook-f585b.firebaseapp.com",
         projectId: "virtual-logbook-f585b",
       };
 
-      // Firebase initialiseren
-      const app = firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
+      // 🔹 Init Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
 
       const tableBody = document.getElementById("logTableBody");
 
@@ -146,7 +149,9 @@
       let picHours = 0;
       let checkFlights = 0;
 
-      db.collection("flights").orderBy("date", "desc").onSnapshot(snapshot => {
+      // 🔹 Firestore query
+      const q = query(collection(db, "flights"), orderBy("date", "desc"));
+      onSnapshot(q, snapshot => {
         tableBody.innerHTML = "";
         startsCount = 0;
         picHours = 0;
@@ -156,7 +161,6 @@
           const flight = doc.data();
           const date = new Date(flight.date);
 
-          // Alle vluchten in tabel zetten
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${flight.date || ""}</td>
@@ -169,11 +173,11 @@
           `;
           tableBody.appendChild(row);
 
-          // Statistieken voor laatste 24 maanden
+          // Statistieken 24 maanden
           if (date >= past24m) {
             startsCount += 1;
 
-            // PIC uren (verwacht formaat "h:mm")
+            // PIC uren (h:mm)
             if (flight.time) {
               const parts = flight.time.split(":");
               if (parts.length === 2) {
@@ -181,7 +185,7 @@
               }
             }
 
-            // Checkvluchten tellen (bv. als 'check' in opmerkingen staat)
+            // Checkvluchten
             if (flight.remarks && flight.remarks.toLowerCase().includes("check")) {
               checkFlights += 1;
             }
@@ -194,13 +198,13 @@
         checkFlightsEl.textContent = checkFlights;
       });
 
+      // 🔹 Header inladen
       fetch("header.html")
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById("header-placeholder").innerHTML = data;
-        // Dynamisch de title invullen:
-        document.getElementById("page-title").innerText = document.title;
-      });
+        .then(r => r.text())
+        .then(data => {
+          document.getElementById("header-placeholder").innerHTML = data;
+          document.getElementById("page-title").innerText = document.title;
+        });
     </script>
   </body>
 </html>
