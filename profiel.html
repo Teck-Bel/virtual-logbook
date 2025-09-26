@@ -5,9 +5,9 @@
     <title>Profiel | Virtual Logbook</title>
     <link rel="stylesheet" href="style.css"/>
   </head>
-  <body>
+  <body data-tile="Profiel">
+    <div id="header-placeholder"></div>
      <div class="container index-container">
-       <h1>Profiel</h1>
        <p>Hier kan u uw gegevens aanpassen.</p>
 
        <form class="profile-form">
@@ -24,5 +24,14 @@
          <button type="submit">Opslaan</button>
        </form>
      </div>
+    <script>
+      fetch("header.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("header-placeholder").innerHTML = data;
+        // Dynamisch de title invullen:
+        document.getElementById("page-title").innerText = document.title;
+      });
+    </script>
   </body>
 </html>
