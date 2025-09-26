@@ -78,10 +78,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
   </head>
-  <body>
+  <body data-tile="Logbook">
+    <div id="header-placeholder"></div>
+
     <!-- 🔹 Titel + Dashboard -->
     <div class="header-bar">
-      <h1>Mijn Logbook</h1>
       <div class="stats-bar">
         <div class="stat">
           <h2 id="startsCount">0</h2>
@@ -191,6 +192,14 @@
         startsCountEl.textContent = startsCount;
         picHoursEl.textContent = picHours.toFixed(1);
         checkFlightsEl.textContent = checkFlights;
+      });
+
+      fetch("header.html")
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById("header-placeholder").innerHTML = data;
+        // Dynamisch de title invullen:
+        document.getElementById("page-title").innerText = document.title;
       });
     </script>
   </body>
